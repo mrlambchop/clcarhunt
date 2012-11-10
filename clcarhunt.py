@@ -40,12 +40,30 @@ can periodically clean the list
 
 dataFile = "cldata.txt"
 
+'''
+cached directory for the intermediate files
+'''
+cachedir = "cache"
+
 newOutput = []
 dataContainer = []
 pageContainer = []
 urlContainer = []
 items = []
 entries = []
+
+
+class clURL:
+   def __init__( self, url, catagory ):
+      self.url = url
+      self.catagory = catagory
+
+
+class clPageContainer:
+   def __init__(self, pagedata, catagory):
+      self.pagedata = pagedata
+      self.catagory = catagory
+
 
 ########################################################
 def loadDataFile():
@@ -80,7 +98,16 @@ def saveDataFile():
 	
 	file = open(dataFile,"w")
 	print >>file,data
-	
+
+
+########################################################
+def fetchPage( page ):
+    f = urllib.urlopen(page)
+    s = f.read()
+    f.close()
+    return s
+
+
 ########################################################
 def readTheWebContent():
 	
@@ -92,10 +119,7 @@ def readTheWebContent():
 	global urlContainer
 	
 	for thisURL in urlContainer:
-		f = urllib.urlopen(thisURL)
-		s = f.read()
-		f.close()
-		pageContainer.append(s)
+		pageContainer.append( clPageContainer( fetchPage( thisURL.url ), thisURL.catagory) )
 
 ########################################################
 def parseFeeds():
@@ -111,7 +135,7 @@ def parseFeeds():
 	for xmlData in pageContainer:
 		
 		try:
-			dom = xml.dom.minidom.parseString(xmlData)
+			dom = xml.dom.minidom.parseString(xmlData.pagedata)
 			x = 0
 			for eNode in dom.getElementsByTagName('item'):
 				if (len(eNode.getElementsByTagName('description')[0].firstChild.data) > 0):
@@ -122,8 +146,9 @@ def parseFeeds():
 					items.append({
 						'link' : tl,
 						'title' : tt,
-						'description': td
-						
+						'description': td,
+						'catagory': xmlData.catagory,
+                                                'pagedata': xmlData.pagedata
 					})
 		except:
 			pass
@@ -148,7 +173,7 @@ def fetchFeedURLS():
 
 			#url = "http://" + line.rstrip() + ".craigslist.org/" + t +"/index.rss"
 			url = "http://" + line.rstrip() + ".craigslist.org/search/" + t +"?minAsk=" + str(minPrice) + "&query=" + k + "&srchType=T&format=rss"
-			urlContainer.append(url)
+			urlContainer.append( clURL( url, k ) ) # currently k is our catagory!
 
 ####################################################
 def checkIfWanted(title,description):
@@ -231,7 +256,9 @@ def processOutput():
 		link = e['link']
 		title = e['title']
 		desc = e['description']
-		
+		catagory = e['catagory']
+                pagedata = e['pagedata']
+
 		passed = True #checkIfWanted(title,desc)
 						
 		if passed == True:
@@ -247,7 +274,18 @@ def processOutput():
 				
 				out += urlparse(link).netloc.split('.')[0] + "\n"
 				out += "---------------------------\n"
-					
+
+                                #cache the pagedata to disk for later scraping
+                                if not os.path.exists(cachedir + "/" + catagory):
+                                   os.makedirs(cachedir + "/" + catagory)
+
+                                flatlink = link.replace('/', "_")
+                                cachedpage = str( cachedir + "/" + catagory + "/" + flatlink)
+
+                                f = file( cachedpage, "w" )
+                                f.write( fetchPage( link )  )
+                                f.close()
+
 	return out
 #####################################################
 #main
@@ -271,9 +309,6 @@ The run-time for this script is about 1.6 seconds per feed, and almost all of th
 
 if len(newOutput) > 0:
 	
-	#print "After reading web content, clock is at " + str(t2 - t1) + " seconds"
-	#print "Found " + str(len(items)) + " items. clock is at  " + str(t3 - t1) + " seconds"
-	#print "Done.  Found " + str(len(newOutput))+ " new items.  Procedure took " + str(time.time() - t1) + " seconds\n"
         print len(items), "new cars"
 	print out
 	
