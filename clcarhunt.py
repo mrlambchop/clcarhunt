@@ -16,7 +16,7 @@ minPrice = 14000
 keyPhrases list contains those key words or phrases that we want in search results
 '''
 
-keyPhrases = ['audi%20avant', 'audi%20wagon', 'audi%20a3', 'audi%20q5', 'audi%20a7', 'subaru%20outback', 'bmw%20wagon', 'ford%20edge', 'outback%20sport']
+keyPhrases = ['audi%20avant', 'audi%20wagon', 'audi%20a3', 'audi%20q5', 'audi%20q7', 'subaru%20outback', 'bmw%20wagon', 'ford%20edge', 'outback%20sport', 'audi%20allroad']
 
 '''
 postTypes list contains that types of Craigslist ads.  Eg, "web" signifies ads appearing in Craigslist's web developer/engineer ads
@@ -224,7 +224,7 @@ def processOutput():
 	global newOutput
 	global items
 
-        print "Found", len(items), "cars"
+        #print "Found", len(items), "cars"
 	
 	for e in items:
 		
@@ -245,12 +245,6 @@ def processOutput():
 				out += title + "\n"
 				out += link + "\n"
 				
-				commute = "telecommuting is ok"
-				ck = re.compile(commute, re.IGNORECASE)
-				tc = ck.findall(desc)
-				if len(tc) > 0:
-					out += "Telecommuting is ok\n"
-					
 				out += urlparse(link).netloc.split('.')[0] + "\n"
 				out += "---------------------------\n"
 					
@@ -277,9 +271,10 @@ The run-time for this script is about 1.6 seconds per feed, and almost all of th
 
 if len(newOutput) > 0:
 	
-	print "After reading web content, clock is at " + str(t2 - t1) + " seconds"
-	print "Found " + str(len(items)) + " items. clock is at  " + str(t3 - t1) + " seconds"
-	print "Done.  Found " + str(len(newOutput))+ " new items.  Procedure took " + str(time.time() - t1) + " seconds\n"
+	#print "After reading web content, clock is at " + str(t2 - t1) + " seconds"
+	#print "Found " + str(len(items)) + " items. clock is at  " + str(t3 - t1) + " seconds"
+	#print "Done.  Found " + str(len(newOutput))+ " new items.  Procedure took " + str(time.time() - t1) + " seconds\n"
+        print len(items), "new cars"
 	print out
 	
 sys.exit()
