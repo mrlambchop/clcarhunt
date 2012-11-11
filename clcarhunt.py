@@ -249,6 +249,8 @@ def processOutput():
 	global newOutput
 	global items
 
+        newitems = 0
+
         #print "Found", len(items), "cars"
 	
 	for e in items:
@@ -275,6 +277,8 @@ def processOutput():
 				out += urlparse(link).netloc.split('.')[0] + "\n"
 				out += "---------------------------\n"
 
+                                newitems += 1
+
                                 #cache the pagedata to disk for later scraping
                                 if not os.path.exists(cachedir + "/" + catagory):
                                    os.makedirs(cachedir + "/" + catagory)
@@ -286,7 +290,7 @@ def processOutput():
                                 f.write( fetchPage( link )  )
                                 f.close()
 
-	return out
+	return out, newitems
 #####################################################
 #main
 
@@ -297,7 +301,8 @@ readTheWebContent()
 t2 = time.time()
 parseFeeds()
 t3 = time.time()
-out = processOutput().encode('utf-8')
+out, newitems = processOutput()
+out = out.encode('utf-8')
 saveDataFile()
 
 '''
@@ -310,6 +315,7 @@ The run-time for this script is about 1.6 seconds per feed, and almost all of th
 if len(newOutput) > 0:
 	
         print len(items), "new cars"
+        print newitems, "found cars"
 	print out
 	
 sys.exit()
