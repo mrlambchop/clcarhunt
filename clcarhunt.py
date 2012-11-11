@@ -16,7 +16,7 @@ minPrice = 14000
 keyPhrases list contains those key words or phrases that we want in search results
 '''
 
-keyPhrases = ['audi%20avant', 'audi%20wagon', 'audi%20a3', 'audi%20q5', 'audi%20q7', 'subaru%20outback', 'bmw%20wagon', 'ford%20edge', 'outback%20sport', 'audi%20allroad']
+keyPhrases = []
 
 '''
 postTypes list contains that types of Craigslist ads.  Eg, "web" signifies ads appearing in Craigslist's web developer/engineer ads
@@ -39,6 +39,13 @@ can periodically clean the list
 '''
 
 dataFile = "cldata.txt"
+
+'''
+keyFile contains the list of keys to find (aka cars)
+'''
+
+keyFile = "clcars.txt"
+
 
 '''
 cached directory for the intermediate files
@@ -66,18 +73,19 @@ class clPageContainer:
 
 
 ########################################################
-def loadDataFile():
+def readDataFile( filename ):
 	
-	global dataContainer
-	global dataFile
-	
+        data = []
+
 	try:
 		
-		dataContainer += open(dataFile,"rU").readlines()
+		data = open(filename,"rU").readlines()
 		
 	except:
 	
 		pass
+
+        return data
 	
 #######################################################
 def saveDataFile():
@@ -294,15 +302,22 @@ def processOutput():
 #####################################################
 #main
 
-t1 = time.time()
-loadDataFile()
+#read existing storage file
+dataContainer += readDataFile( dataFile )
+
+#read the key phrases
+keyPhrases = readDataFile( keyFile )
+
+#web traffic
 fetchFeedURLS()
 readTheWebContent()
-t2 = time.time()
+
+#post processing
 parseFeeds()
-t3 = time.time()
 out, newitems = processOutput()
 out = out.encode('utf-8')
+
+#store the new state
 saveDataFile()
 
 '''
@@ -313,9 +328,9 @@ The run-time for this script is about 1.6 seconds per feed, and almost all of th
 '''
 
 if len(newOutput) > 0:
-	
-        print len(items), "new cars"
-        print newitems, "found cars"
+
+        print newitems, "new cars"	
+        print len(items), "found cars"
 	print out
 	
 sys.exit()
