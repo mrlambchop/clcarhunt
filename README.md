@@ -3,12 +3,11 @@ clcarhunt
 
 The Great Craigslist Car Hunt
 
-Originally cloned from http://sariley.com/pages/sample4 and hacked to hunt for used Audi's, Fords and rare BMW's.
+A script to poll CL, looking for specific cars for sale that were extremely hard to find.
 
-I run this on a cronjob every so often, sending the output to my email.
+I run this on a cronjob every so often (ha. as if. I ran it as often as possible!), sending the output to my email.
 
-Webpages are cached in the cache directory - main reason for this is to detect scams where the same (convincing) add is posted multiple times. Secondary is where an item
-remains on CL for some time, but keeps getting a new posting.
+Webpages are cached in the cache directory - main reason for this is to detect scams where the same (convincing) add is posted multiple times. Secondary is where an item remains on CL for some time, but keeps getting a new posting.
 
 Cheers,
 
